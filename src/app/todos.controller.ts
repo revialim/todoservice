@@ -1,15 +1,20 @@
-import { Controller, Get, Post, Param } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { CreateTodoDto } from './todos.dto';
+import { Todo } from './todos.interface';
+import { TodosService } from './todos.service';
 
 @Controller('todos')
 export class TodosController {
+  constructor(private todosService: TodosService) {}
+
   @Post()
-  create(): string {
-    return 'This action adds a new todo';
+  async create(@Body() createTodoDto: CreateTodoDto) {
+    this.todosService.create(createTodoDto);
   }
 
   @Get()
-  findAll(): string {
-    return 'This action returns all todos';
+  async findAll(): Promise<Todo[]> {
+    return this.todosService.findAll();
   }
 
   @Get(':id')
