@@ -27,6 +27,10 @@ export class TodosService {
     return this.todos;
   }
 
+  findOne(id: number) {
+    return this.todos.find(t => t.id === id);
+  }
+
   update(id: number, todoUpdate: Todo){
     this.todos.find(t => {
       if(t.id === id){

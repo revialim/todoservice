@@ -30,8 +30,7 @@ export class TodosController {
   }
 
   @Get(':id')
-  findOne(@Param() params): string {
-    console.log(params.id);
-    return `This action returns a todo with id #${params.id} `;
+  findOne(@Param() params): Todo {
+    return this.todosService.findOne(Number(params.id));
   }
 }
