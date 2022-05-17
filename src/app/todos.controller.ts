@@ -1,17 +1,24 @@
 import { Controller, Get, Post, Param, Body, Delete, Put } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTodoDto } from './todos.dto';
 import { Todo } from './todos.interface';
 import { TodosService } from './todos.service';
 
+@ApiTags('todos')
 @Controller('todos')
 export class TodosController {
   constructor(private todosService: TodosService) {}
 
+  //value = "Creates a new todo, saves it to a list of todos"
+  @ApiOperation({description: "Create a new todo, save it to a list of todos"})
+  @ApiResponse({status: 201, description: 'The todo has been successfully created.'})
   @Post()
   async create(@Body() createTodo: CreateTodoDto) {
     this.todosService.create(createTodo);
   }
 
+  @ApiOperation({description: "Update a todo by id"})
+  @ApiResponse({status: 201, description: 'The todo has been successfully updated.'})
   @Put(':id')
   async update(@Param() params, @Body() updateTodo: CreateTodoDto) {
     // console.log('TodosController => update => params', params);
@@ -19,16 +26,22 @@ export class TodosController {
     this.todosService.update(Number(params.id), updateTodo);
   }
 
+  @ApiOperation({description: "Delete a todo by id"})
+  @ApiResponse({status: 201, description: 'The todo has been successfully deleted.'})
   @Delete(':id')
   delete(@Param() params) {
     this.todosService.delete(params.id);
   }
 
+  @ApiOperation({description: 'Get all todos'})
+  @ApiResponse({status: 200, description: 'All todos successfully received.'})
   @Get()
   async findAll(): Promise<Todo[]> {
     return this.todosService.findAll();
   }
 
+  @ApiOperation({description: 'Get a todo by id'})
+  @ApiResponse({status: 200, description: 'Todo by id successfully received.'})
   @Get(':id')
   findOne(@Param() params): Todo {
     return this.todosService.findOne(Number(params.id));
