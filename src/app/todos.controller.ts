@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Body, Delete, Put } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTodoDto } from './todos.dto';
 import { Todo } from './todos.interface';
 import { TodosService } from './todos.service';
@@ -19,6 +19,10 @@ export class TodosController {
 
   @ApiOperation({description: "Update a todo by id"})
   @ApiResponse({status: 201, description: 'The todo has been successfully updated.'})
+  @ApiParam({
+    name: 'id',
+    description: 'Gets the todo id',
+  })
   @Put(':id')
   async update(@Param() params, @Body() updateTodo: CreateTodoDto) {
     // console.log('TodosController => update => params', params);
@@ -28,6 +32,10 @@ export class TodosController {
 
   @ApiOperation({description: "Delete a todo by id"})
   @ApiResponse({status: 201, description: 'The todo has been successfully deleted.'})
+  @ApiParam({
+    name: 'id',
+    description: 'Gets the todo id',
+  })
   @Delete(':id')
   delete(@Param() params) {
     this.todosService.delete(params.id);
@@ -42,6 +50,10 @@ export class TodosController {
 
   @ApiOperation({description: 'Get a todo by id'})
   @ApiResponse({status: 200, description: 'Todo by id successfully received.'})
+  @ApiParam({
+    name: 'id',
+    description: 'Gets the todo id',
+  })
   @Get(':id')
   findOne(@Param() params): Todo {
     return this.todosService.findOne(Number(params.id));

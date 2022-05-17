@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 
+
+export type oneThroughThree = 1 | 2 | 3;
 export class CreateTodoDto {
   @ApiProperty({
     description:'Todo title',
@@ -20,7 +22,7 @@ export class CreateTodoDto {
   readonly id: number;
 
   @ApiProperty({
-    description:'A todos priority (1-10)',
+    description:'A todo\'s priority (1-10)',
     type: Number
   })
   readonly priority: number;
@@ -35,5 +37,5 @@ export class CreateTodoDto {
      description: 'Types for todos encoded by numbers',
      example: '"WORK": 1,"PERSONAL": 2,"IMPORTANT": 3'
    })
-   readonly type: 1 | 2 | 3;
+   readonly type: oneThroughThree;
 }
