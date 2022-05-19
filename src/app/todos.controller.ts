@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Delete, Put, BadRequestException } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTodoDto } from './todos.dto';
 import { Todo } from './todos.interface';
@@ -17,12 +17,26 @@ export class TodosController {
     this.todosService.create(createTodo);
   }
 
+  @ApiOperation({description: "Update a todo by id, mark as done or not done"})
+  @ApiResponse({status: 201, description: 'The todo\'s isDone has been successfully updated.'})
+  @ApiParam({name: 'id', description: 'Gets the todo id', type: Number})
+  @ApiParam({name: 'isDone', description: 'Gets the todo\'s isDone', type: Boolean})
+  @Put('/isDone/:id/:isDone')
+  async updateIsDone(@Param() params) {
+    // console.log('TodosController => update => params', params);
+    // console.log('TodosController => update => updateTodo', updateTodo);
+    if (params.isDone === 'true') {
+      this.todosService.updateIsDone(Number(params.id), true);
+    } else if (params.isDone === 'false') {
+      this.todosService.updateIsDone(Number(params.id), false);
+    } else {
+      throw new BadRequestException('Wrong parameter passed.');
+    }
+  }
+
   @ApiOperation({description: "Update a todo by id"})
   @ApiResponse({status: 201, description: 'The todo has been successfully updated.'})
-  @ApiParam({
-    name: 'id',
-    description: 'Gets the todo id',
-  })
+  @ApiParam({name: 'id', description: 'Gets the todo id'})
   @Put(':id')
   async update(@Param() params, @Body() updateTodo: CreateTodoDto) {
     // console.log('TodosController => update => params', params);
@@ -32,10 +46,7 @@ export class TodosController {
 
   @ApiOperation({description: "Delete a todo by id"})
   @ApiResponse({status: 201, description: 'The todo has been successfully deleted.'})
-  @ApiParam({
-    name: 'id',
-    description: 'Gets the todo id',
-  })
+  @ApiParam({name: 'id', description: 'Gets the todo id'})
   @Delete(':id')
   delete(@Param() params) {
     this.todosService.delete(params.id);

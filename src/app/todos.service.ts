@@ -18,7 +18,6 @@ export class TodosService {
   create(todo: Todo) {
     this.todoIdCounter ++; //TODO: change this when adding database
     todo.id = this.todoIdCounter;
-    console.log('new todo - push todo: ', todo);
 
     this.todos.push(todo);
   }
@@ -31,16 +30,24 @@ export class TodosService {
     return this.todos.find(t => t.id === id);
   }
 
-  update(id: number, todoUpdate: Todo){
+  update(id: number, todoUpdate: Todo) {
     this.todos.find(t => {
       if(t.id === id){
-        console.log('t.id === id')
         t.title = todoUpdate.title;
         t.description = todoUpdate.description;
+        t.priority = todoUpdate.priority;
+        t.type = todoUpdate.type;
       }
     })
-    // console.log('TodosService => update => todoUpdate', todoUpdate);
-    // console.log('TodosService => update => this.todos', this.todos);
+  }
+
+  updateIsDone(id: number, isDone: boolean) {
+    // console.log("🚀 ~ file: todos.service.ts ~ line 45 ~ TodosService ~ updateIsDone ~ isDone", isDone)
+    this.todos.find(t => {
+      if(t.id === id){
+        t.isDone = isDone;
+      }
+    })
   }
 
   delete(id: number) {
