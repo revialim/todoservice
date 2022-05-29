@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Todo } from './todos.interface';
 import { filter } from 'fp-ts/Array'
-import { map } from 'fp-ts/Array';
+// import { map } from 'fp-ts/Array';
 import { pipe } from 'fp-ts/lib/function';
-import { oneThroughThree } from './todos.dto';
+import { CreateTodoDto, oneThroughThree } from './todos.dto';
+// import { None, Some } from 'fp-ts/lib/Option';
+import * as O from 'fp-ts/Option'
 @Injectable()
 export class TodosService {
   
@@ -18,11 +20,40 @@ export class TodosService {
 
   private todoIdCounter = 1;
 
-  create(todo: Todo) {
-    this.todoIdCounter ++; //TODO: change this when adding database
-    todo.id = this.todoIdCounter;
+  setInitialData(todos: Todo[]){
+    this.todoIdCounter = 0;
+    this.todos = todos;
+    this.todos.map(t => {
+      this.todoIdCounter ++;
+      t.id = this.todoIdCounter;
+    });
+    // this.todos = [];
+    // return pipe(
+    //   todos,
+    //   (ts) => {
+    //     ts.forEach(t =>{
+    //       this.todoIdCounter ++;
+    //       t.id = this.todoIdCounter;
+    //       this.todos.push(t);
+    //     });
+    //     return this.todos;
+    //   },
+      // O.map()
+    // )
+  }
 
-    this.todos.push(todo);
+  create(createTodo: CreateTodoDto): Todo {
+    this.todoIdCounter ++; //TODO: change this when adding database
+    const newTodo: Todo = {
+      id: this.todoIdCounter,
+      title: createTodo.title ? createTodo.title : '',
+      description: createTodo.description ? createTodo.description : '',
+      isDone: createTodo.isDone ? createTodo.isDone : false,
+      priority: createTodo.priority ? createTodo.priority : 10,
+      type: createTodo.type ? createTodo.type : 1
+    }
+    this.todos.push(newTodo);
+    return newTodo;
   }
 
   findAll(): Todo[] {
@@ -30,59 +61,67 @@ export class TodosService {
   }
 
   findOne(id: number): Todo {
-    // return this.todos.find(t => t.id === id);
-    const filtered = filter(this.checkTodoForSameId(id))(this.todos);
-    return this.getObjFromArr(filtered);
+    if(this.todos.find(t => t.id === id) == undefined){
+      throw new Error(`id: ${id} does not exist in todos`)
+    }
+    return pipe(
+      this.todos,
+      this.findTodo(id),
+      (t) => O.toNullable(t),
+    );
   }
 
-  update(id: number, todoUpdate: Todo) {
-    pipe(
+  update(id: number, todoUpdate: Todo): Todo {
+    if(this.todos.find(t => t.id === id) == undefined){
+      throw new Error(`id: ${id} does not exist in todos, therefore cannot be updated`)
+    }
+    if(todoUpdate.id != id){
+      throw new Error('The id on an existing todo should not be updated')
+    }
+    return pipe(
       this.todos, 
-      filter(this.checkTodoForSameId(id)), 
-      this.getObjFromArr, 
+      this.findTodo(id),
       this.updateTodoObj(todoUpdate.title, todoUpdate.description, todoUpdate.priority, todoUpdate.type)
     );
-    // this.todos.find(t => {
-    //   if(t.id === id){
-    //     t.title = todoUpdate.title;
-    //     t.description = todoUpdate.description;
-    //     t.priority = todoUpdate.priority;
-    //     t.type = todoUpdate.type;
-    //   }
-    // })
   }
 
-  updateIsDone(id: number, isDone: boolean) {
-    pipe(
+  updateIsDone(id: number, isDone: boolean): Todo {
+    if(this.todos.find(t => t.id === id) == undefined){
+      throw new Error(`id: ${id} does not exist in todos, therefore cannot be updated`)
+    }
+    return pipe(
       this.todos, 
-      filter(this.checkTodoForSameId(id)),
-      map(this.changeIsDone(isDone)) 
+      this.findTodo(id),
+      this.changeIsDone(isDone)
     );
-    // this.todos.find(t => {
-    //   if(t.id === id){
-    //     t.isDone = isDone;
-    //   }
-    // })
   }
 
   delete(id: number) {
-    // this.todos = this.todos.filter(t => t.id != id);
+    if(this.todos.find(t => t.id === id) == undefined){
+      throw new Error(`id: ${id} does not exist in todos, delete failed`)
+    }
     this.todos = filter(this.checkTodoForNotSameId(id))(this.todos);
   }
 
   ///////// helper
-  private todoHasNotSameId = (t: Todo, id: number) => t.id != id;
-  private checkTodoForNotSameId = (id: number) => (t: Todo) => this.todoHasNotSameId(t, id);
+  private findTodo: (id:number) => (todoArr: Todo[]) => O.Option<Todo> = (id: number) => (todoArr: Todo[]) => O.fromNullable(todoArr.find(t => t.id === id));
 
-  private todoHasSameId = (t: Todo, id: number) => t.id === id;
-  private checkTodoForSameId = (id: number) => (t: Todo) => this.todoHasSameId(t, id);
+  private checkTodoForNotSameId = (id: number) => (t: Todo) => t.id != id;
 
-  private changeIsDone = (isDone: boolean) => (t: Todo) => t.isDone = isDone;
-  private updateTodoObj = (ti: string, d: string, p: number, ty: oneThroughThree) => (todo: Todo) => {
-    todo.title = ti;
-    todo.description = d;
-    todo.priority = p;
-    todo.type = ty;
-  }
-  private getObjFromArr = a => a[0];
+  private changeIsDone = (isDone: boolean) => (t: O.Option<Todo>) => {
+    O.toNullable(t).isDone = isDone
+    return O.toNullable(t);
+  };
+
+  private updateTodoObj: (ti: string, d: string, p: number, ty: oneThroughThree) => (todo:  O.Option<Todo>) => Todo = 
+    (ti: string, d: string, p: number, ty: oneThroughThree) => (todo:  O.Option<Todo>) => {
+      if(O.isSome(todo)){
+        O.toNullable(todo).title = ti;
+        O.toNullable(todo).description = d;
+        O.toNullable(todo).priority = p;
+        O.toNullable(todo).type = ty;
+      }
+      return O.toNullable(todo);
+    }
+  // private getObjFromArr = a => a[0];
 }

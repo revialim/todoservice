@@ -1,7 +1,7 @@
 export interface Todo {
   title: string;
   description: string;
-  id: number;
+  id: Readonly<number>;
   priority: number;
   isDone: boolean;
   /**
