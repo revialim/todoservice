@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Todo } from './todos.interface';
-import { filter } from 'fp-ts/Array'
-// import { map } from 'fp-ts/Array';
-import { pipe } from 'fp-ts/lib/function';
 import { CreateTodoDto, oneThroughThree } from './todos.dto';
-// import { None, Some } from 'fp-ts/lib/Option';
-import * as O from 'fp-ts/Option'
+import { pipe } from 'fp-ts/lib/function';
+import * as O from 'fp-ts/Option';
+import * as A from 'fp-ts/Array';
+
 @Injectable()
 export class TodosService {
   
@@ -23,23 +22,14 @@ export class TodosService {
   setInitialData(todos: Todo[]){
     this.todoIdCounter = 0;
     this.todos = todos;
-    this.todos.map(t => {
-      this.todoIdCounter ++;
+    const assignId = t => { 
+      this.todoIdCounter++;
       t.id = this.todoIdCounter;
-    });
-    // this.todos = [];
-    // return pipe(
-    //   todos,
-    //   (ts) => {
-    //     ts.forEach(t =>{
-    //       this.todoIdCounter ++;
-    //       t.id = this.todoIdCounter;
-    //       this.todos.push(t);
-    //     });
-    //     return this.todos;
-    //   },
-      // O.map()
-    // )
+    }
+    return pipe(
+      this.todos,
+      A.map(assignId)
+    );
   }
 
   create(createTodo: CreateTodoDto): Todo {
@@ -75,7 +65,7 @@ export class TodosService {
     if(this.todos.find(t => t.id === id) == undefined){
       throw new Error(`id: ${id} does not exist in todos, therefore cannot be updated`)
     }
-    if(todoUpdate.id != id){
+    if(todoUpdate.id != undefined && todoUpdate.id != id){
       throw new Error('The id on an existing todo should not be updated')
     }
     return pipe(
@@ -100,7 +90,7 @@ export class TodosService {
     if(this.todos.find(t => t.id === id) == undefined){
       throw new Error(`id: ${id} does not exist in todos, delete failed`)
     }
-    this.todos = filter(this.checkTodoForNotSameId(id))(this.todos);
+    this.todos = A.filter(this.checkTodoForNotSameId(id))(this.todos);
   }
 
   ///////// helper

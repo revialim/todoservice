@@ -22,8 +22,6 @@ describe('TodosService', () => {
     it('should create initial todo array with individual ids', async () => {
       todosService.setInitialData(initTodos);
       const initializedTodos = todosService.findAll();
-      // console.log("🚀 ~ file: todos.service.spec.ts ~ line 24 ~ it ~ initTodos", initTodos)
-      // console.log("🚀 ~ file: todos.service.spec.ts ~ line 25 ~ it ~ initializedTodos", initializedTodos)
       expect(initializedTodos).toEqual(initTodos);
     })
   })
