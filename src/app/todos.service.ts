@@ -4,6 +4,7 @@ import { CreateTodoDto, oneThroughThree } from './todos.dto';
 import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
+import * as E from 'fp-ts/Either';
 
 @Injectable()
 export class TodosService {
@@ -51,15 +52,28 @@ export class TodosService {
   }
 
   findOne(id: number): Todo {
-    if(this.todos.find(t => t.id === id) == undefined){
-      throw new Error(`id: ${id} does not exist in todos`)
+    const errorMessage = `id: ${id} does not exist in todos`;
+
+    const findOneEither: (id:number) => E.Either<Error , Todo> = (id:number) => {
+      if(this.todos.find(t => t.id === id) == undefined){
+        return E.left(new Error(errorMessage));
+      }
+      return E.right(pipe(
+        this.todos,
+        this.findTodo(id),
+        (t) => O.toNullable(t),
+      ));
     }
-    return pipe(
-      this.todos,
-      this.findTodo(id),
-      (t) => O.toNullable(t),
-    );
+    const maybeTodo: E.Either<Error, Todo> = findOneEither(id);
+
+    if(E.isLeft(maybeTodo)){
+      console.log("🚀 ~ file: todos.controller.ts ~ line 78 ~ TodosController ~ findOne ~ maybeTodo.left.message", maybeTodo.left.message)
+      throw new Error(maybeTodo.left.message)
+    } else {
+      return maybeTodo.right;
+    }
   }
+
 
   update(id: number, todoUpdate: Todo): Todo {
     if(this.todos.find(t => t.id === id) == undefined){
