@@ -49,7 +49,7 @@ export class TodosService {
     return this.todos;
   }
 
-  findOne(id: number): Todo {
+  findOne(id: number): E.Either<Error, Todo>  {
     const errorMessage = `id: ${id} does not exist in todos`;
 
     const findOneEither: (id: number) => E.Either<Error, Todo> = (
@@ -62,14 +62,7 @@ export class TodosService {
         pipe(this.todos, this.findTodo(id), (t) => O.toNullable(t)),
       );
     };
-    const maybeTodo: E.Either<Error, Todo> = findOneEither(id);
-
-    if (E.isLeft(maybeTodo)) {
-      //if error occured, throw error
-      throw new Error(maybeTodo.left.message);
-    } else {
-      return maybeTodo.right; //no error occured and todo is returned
-    }
+    return findOneEither(id);
   }
 
   update(id: number, todoUpdate: Todo): Todo {

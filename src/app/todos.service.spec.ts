@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CreateTodoDto } from './todos.dto';
 import { Todo } from './todos.interface';
 import { TodosService } from './todos.service';
+import * as E from 'fp-ts/Either';
 
 describe('TodosService', () => {
   let todosService: TodosService;
@@ -72,7 +73,7 @@ describe('TodosService', () => {
         isDone: undefined,
       };
       const createdTodo = todosService.create(newTodo);
-      expect(todosService.findOne(createdTodo.id)).toEqual({
+      expect(createdTodo).toEqual({
         id: createdTodo.id,
         title: 'sometitle',
         description: '',
@@ -103,13 +104,14 @@ describe('TodosService', () => {
 
     it('should find a certain todo by id', async () => {
       todosService.setInitialData([initialTodo]);
-      expect(todosService.findOne(1)).toEqual(initialTodo);
+      const todoEitherRight = E.right(initialTodo);
+      const foundTodo = todosService.findOne(1);
+      expect(foundTodo).toEqual(todoEitherRight);
     });
     it('should throw error when todo with corresponding id does not exist', async () => {
       todosService.setInitialData([initialTodo]);
-      expect(() => todosService.findOne(2)).toThrowError(
-        new Error('id: 2 does not exist in todos'),
-      );
+      const findOneEither = todosService.findOne(2);
+      expect(E.isLeft(findOneEither)).toEqual(true);
     });
   });
 

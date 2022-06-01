@@ -7,11 +7,13 @@ import {
   Delete,
   Put,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTodoDto } from './todos.dto';
 import { Todo } from './todos.interface';
 import { TodosService } from './todos.service';
+import * as E from 'fp-ts/Either';
 
 @ApiTags('todos')
 @Controller('todos')
@@ -41,7 +43,7 @@ export class TodosController {
   @ApiParam({ name: 'id', description: 'Gets the todo id', type: Number })
   @ApiParam({
     name: 'isDone',
-    description: "Gets the todo's isDone",
+    description: "Contains the todo's isDone value",
     type: Boolean,
   })
   @Put('/isDone/:id/:isDone')
@@ -62,7 +64,7 @@ export class TodosController {
     status: 201,
     description: 'The todo has been successfully updated.',
   })
-  @ApiParam({ name: 'id', description: 'Gets the todo id' })
+  @ApiParam({ name: 'id', description: 'Contains the todo id' })
   @Put(':id')
   async update(@Param() params, @Body() updateTodo: CreateTodoDto) {
     // console.log('TodosController => update => params', params);
@@ -75,7 +77,7 @@ export class TodosController {
     status: 201,
     description: 'The todo has been successfully deleted.',
   })
-  @ApiParam({ name: 'id', description: 'Gets the todo id' })
+  @ApiParam({ name: 'id', description: 'Contains the todo id' })
   @Delete(':id')
   delete(@Param() params) {
     this.todosService.delete(Number(params.id));
@@ -93,12 +95,21 @@ export class TodosController {
     status: 200,
     description: 'Todo by id successfully received.',
   })
+  @ApiResponse({
+    status: 404,
+    description: 'Todo not found.',
+  })
   @ApiParam({
     name: 'id',
-    description: 'Gets the todo id',
+    description: 'Contains the todo id',
   })
   @Get(':id')
   findOne(@Param() params): Todo {
-    return this.todosService.findOne(Number(params.id));
+    const maybeTodo = this.todosService.findOne(Number(params.id));
+    if (E.isLeft(maybeTodo)) {
+      throw new NotFoundException(maybeTodo.left.message);
+    } else {
+      return maybeTodo.right; //no error occured and todo is returned
+    }
   }
 }

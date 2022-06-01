@@ -3,6 +3,9 @@ import { TodosController } from './todos.controller';
 import { CreateTodoDto } from './todos.dto';
 import { Todo } from './todos.interface';
 import { TodosService } from './todos.service';
+import { pipe } from 'fp-ts/lib/function';
+import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 
 describe('TodosController', () => {
   let todosController: TodosController;
@@ -90,17 +93,21 @@ describe('TodosController', () => {
 
   describe('findOne', () => {
     it('should return a todo by id', async () => {
-      const result: Todo = {
+      const result: O.Option<Todo> = O.fromNullable({
         title: 'title',
         description: 'description',
         id: 1,
         type: 1,
         priority: 5,
         isDone: false,
-      };
-      jest.spyOn(todosService, 'findOne').mockImplementation(() => result);
+      });
+      
+      jest.spyOn(todosService, 'findOne').mockImplementation(() => pipe(
+        result,
+        E.fromOption(() => new Error('error'))
+      ));
 
-      expect(await todosController.findOne(1)).toBe(result);
+      expect(await todosController.findOne(1)).toBe(O.toNullable(result));
     });
 
     // it('should not find a todo', async () => {
