@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Todo } from './todos.interface';
 import { CreateTodoDto, oneThroughThree } from './todos.dto';
-import { pipe } from 'fp-ts/lib/function';
+import { flow, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
@@ -52,17 +52,14 @@ export class TodosService {
   findOne(id: number): E.Either<Error, Todo>  {
     const errorMessage = `id: ${id} does not exist in todos`;
 
-    const findOneEither: (id: number) => E.Either<Error, Todo> = (
-      id: number,
-    ) => {
-      if (this.todos.find((t) => t.id === id) === undefined) {
-        return E.left(new Error(errorMessage));
-      }
-      return E.right(
-        pipe(this.todos, this.findTodo(id), (t) => O.toNullable(t)),
-      );
-    };
-    return findOneEither(id);
+    const todo = this.todos.find((t) => t.id === id);
+    const todoOption = O.fromNullable(todo);
+    const todoEither = pipe(
+      todoOption,
+      E.fromOption(() => 'todoOption error'),
+      E.mapLeft(() => new Error(errorMessage))
+    )
+    return todoEither;
   }
 
   update(id: number, todoUpdate: Todo): Todo {
