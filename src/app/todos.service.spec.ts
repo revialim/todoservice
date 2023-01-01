@@ -24,6 +24,7 @@ describe('TodosService', () => {
         priority: 9,
         isDone: false,
         type: 1,
+        deadline: new Date('2023-01-31'),
       },
       {
         title: 'second todo',
@@ -32,6 +33,7 @@ describe('TodosService', () => {
         priority: 9,
         isDone: false,
         type: 1,
+        deadline: new Date('2023-01-31'),
       },
     ];
     it('should create initial todo array with individual ids', async () => {
@@ -51,15 +53,17 @@ describe('TodosService', () => {
         type: 1,
         priority: 5,
         isDone: false,
+        deadline: new Date(),
       };
       const createdTodo = todosService.create(newTodo);
-      const newTodoWithId = {
+      const newTodoWithId: Todo = {
         id: 1,
         title: 'title',
         description: 'description',
         type: 1,
         priority: 5,
         isDone: false,
+        deadline: new Date(),
       };
       expect(createdTodo).toEqual(newTodoWithId);
     });
@@ -71,6 +75,7 @@ describe('TodosService', () => {
         type: undefined,
         priority: undefined,
         isDone: undefined,
+        deadline: new Date('2023-01-31'),
       };
       const createdTodo = todosService.create(newTodo);
       expect(createdTodo).toEqual({
@@ -80,6 +85,7 @@ describe('TodosService', () => {
         type: 1,
         priority: 10,
         isDone: false,
+        deadline: new Date('2023-01-31'),
       });
     });
   });
@@ -100,6 +106,7 @@ describe('TodosService', () => {
       priority: 9,
       isDone: false,
       type: 1,
+      deadline: new Date('2023-01-31'),
     };
 
     it('should find a certain todo by id', async () => {
@@ -123,6 +130,7 @@ describe('TodosService', () => {
       priority: 9,
       isDone: false,
       type: 1,
+      deadline: new Date('2023-01-31'),
     };
 
     it('should update a todo by id in test data to todoWithChanges', async () => {
@@ -134,6 +142,7 @@ describe('TodosService', () => {
         priority: 7,
         isDone: false,
         type: 2,
+        deadline: new Date('2023-01-31'),
       };
       const updatedTodo = todosService.update(1, todoWithChanges);
       expect(updatedTodo).toEqual(todoWithChanges);
@@ -147,6 +156,7 @@ describe('TodosService', () => {
         priority: 7,
         isDone: false,
         type: 2,
+        deadline: new Date('2023-01-31'),
       };
       expect(() => todosService.update(2, todoWithChanges)).toThrowError(
         new Error('id: 2 does not exist in todos, therefore cannot be updated'),
@@ -161,6 +171,7 @@ describe('TodosService', () => {
         priority: 7,
         isDone: false,
         type: 2,
+        deadline: new Date('2023-01-31'),
       };
       expect(() => todosService.update(1, todoWithChanges)).toThrowError(
         new Error('The id on an existing todo should not be updated'),
@@ -176,6 +187,7 @@ describe('TodosService', () => {
       priority: 9,
       isDone: false,
       type: 1,
+      deadline: new Date('2023-01-31'),
     };
 
     it("should update a todo's isDone value", async () => {
@@ -187,6 +199,7 @@ describe('TodosService', () => {
         priority: 9,
         isDone: true,
         type: 1,
+        deadline: new Date('2023-01-31'),
       };
       const updatedTodo = todosService.updateIsDone(1, true);
       expect(updatedTodo).toEqual(todoWithChanges);
@@ -207,6 +220,7 @@ describe('TodosService', () => {
       priority: 9,
       isDone: false,
       type: 1,
+      deadline: new Date('2023-01-31'),
     };
     it("should throw error, if there's no todo with given id", async () => {
       todosService.setInitialData([initialTodo]);

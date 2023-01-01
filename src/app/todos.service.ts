@@ -16,6 +16,7 @@ export class TodosService {
       priority: 9,
       isDone: false,
       type: 1,
+      deadline: new Date('2023-01-31'),
     },
   ];
 
@@ -40,6 +41,7 @@ export class TodosService {
       isDone: createTodo.isDone ? createTodo.isDone : false,
       priority: createTodo.priority ? createTodo.priority : 10,
       type: createTodo.type ? createTodo.type : 1,
+      deadline: createTodo.deadline ? createTodo.deadline : new Date(),
     };
     this.todos.push(newTodo);
     return newTodo;
@@ -79,6 +81,7 @@ export class TodosService {
         todoUpdate.description,
         todoUpdate.priority,
         todoUpdate.type,
+        todoUpdate.deadline,
       ),
     );
   }
@@ -116,14 +119,16 @@ export class TodosService {
     d: string,
     p: number,
     ty: oneThroughThree,
+    dl: Date,
   ) => (todo: O.Option<Todo>) => Todo =
-    (ti: string, d: string, p: number, ty: oneThroughThree) =>
+    (ti: string, d: string, p: number, ty: oneThroughThree, dl: Date) =>
     (todo: O.Option<Todo>) => {
       if (O.isSome(todo)) {
         O.toNullable(todo).title = ti;
         O.toNullable(todo).description = d;
         O.toNullable(todo).priority = p;
         O.toNullable(todo).type = ty;
+        O.toNullable(todo).deadline = dl;
       }
       return O.toNullable(todo);
     };

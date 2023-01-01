@@ -8,4 +8,5 @@ export interface Todo {
    * {"WORK":1,"PERSONAL":2,"IMPORTANT":3}
    */
   type: 1 | 2 | 3;
+  deadline: Date;
 }

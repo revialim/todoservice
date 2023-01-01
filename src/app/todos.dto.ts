@@ -37,4 +37,10 @@ export class CreateTodoDto {
     example: '"WORK": 1,"PERSONAL": 2,"IMPORTANT": 3',
   })
   readonly type: oneThroughThree;
+
+  @ApiProperty({
+    description: 'A deadline for the todo',
+    example: '2023-01-31',
+  })
+  readonly deadline: Date;
 }

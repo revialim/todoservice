@@ -30,6 +30,7 @@ describe('TodosController', () => {
         type: 1,
         priority: 5,
         isDone: false,
+        deadline: new Date('2023-01-31'),
       };
 
       expect(await todosController.create(todo)).toEqual(undefined);
@@ -45,6 +46,7 @@ describe('TodosController', () => {
         type: 1,
         priority: 5,
         isDone: false,
+        deadline: new Date('2023-01-31'),
       };
       jest.spyOn(todosService, 'update').mockImplementation(() => undefined);
 
@@ -62,6 +64,7 @@ describe('TodosController', () => {
           type: 1,
           priority: 5,
           isDone: false,
+          deadline: new Date('2023-01-31'),
         },
       ];
       jest
@@ -82,6 +85,7 @@ describe('TodosController', () => {
           type: 1,
           priority: 5,
           isDone: false,
+          deadline: new Date('2023-01-31'),
         },
       ];
       jest.spyOn(todosService, 'findAll').mockImplementation(() => result);
@@ -100,6 +104,7 @@ describe('TodosController', () => {
         type: 1,
         priority: 5,
         isDone: false,
+        deadline: new Date('2023-01-31'),
       });
 
       jest.spyOn(todosService, 'findOne').mockImplementation(() =>
