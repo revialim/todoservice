@@ -49,7 +49,7 @@ export class TodosService {
     return this.todos;
   }
 
-  findOne(id: number): E.Either<Error, Todo>  {
+  findOne(id: number): E.Either<Error, Todo> {
     const errorMessage = `id: ${id} does not exist in todos`;
 
     const todo = this.todos.find((t) => t.id === id);
@@ -57,8 +57,8 @@ export class TodosService {
     const todoEither = pipe(
       todoOption,
       E.fromOption(() => 'todoOption error'),
-      E.mapLeft(() => new Error(errorMessage))
-    )
+      E.mapLeft(() => new Error(errorMessage)),
+    );
     return todoEither;
   }
 

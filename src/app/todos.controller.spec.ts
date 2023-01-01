@@ -101,11 +101,13 @@ describe('TodosController', () => {
         priority: 5,
         isDone: false,
       });
-      
-      jest.spyOn(todosService, 'findOne').mockImplementation(() => pipe(
-        result,
-        E.fromOption(() => new Error('error'))
-      ));
+
+      jest.spyOn(todosService, 'findOne').mockImplementation(() =>
+        pipe(
+          result,
+          E.fromOption(() => new Error('error')),
+        ),
+      );
 
       expect(await todosController.findOne(1)).toBe(O.toNullable(result));
     });
