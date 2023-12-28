@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export type oneThroughThree = 1 | 2 | 3;
+export type dealineQuery = {deadlineFrom: string, deadlineTo: string}
 export class CreateTodoDto {
   @ApiProperty({
     description: 'Todo title',

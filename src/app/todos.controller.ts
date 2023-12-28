@@ -8,9 +8,10 @@ import {
   Put,
   BadRequestException,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateTodoDto } from './todos.dto';
+import { CreateTodoDto, dealineQuery } from './todos.dto';
 import { Todo } from './todos.interface';
 import { TodosService } from './todos.service';
 import * as E from 'fp-ts/Either';
@@ -30,7 +31,11 @@ export class TodosController {
   })
   @Post()
   async create(@Body() createTodo: CreateTodoDto) {
-    this.todosService.create(createTodo);
+    console.log("🚀 ~ file: todos.controller.ts:34 ~ TodosController ~ create ~ createTodo", createTodo)
+    const t = {...createTodo, deadline: new Date(createTodo.deadline)};
+    
+    console.log("🚀 ~ file: todos.controller.ts:37 ~ TodosController ~ create ~ t", t)
+    this.todosService.create(t);
   }
 
   @ApiOperation({
@@ -86,8 +91,13 @@ export class TodosController {
   @ApiOperation({ description: 'Get all todos' })
   @ApiResponse({ status: 200, description: 'All todos successfully received.' })
   @Get()
-  async findAll(): Promise<Todo[]> {
-    return this.todosService.findAll();
+  async findAll(@Query() query: dealineQuery): Promise<Todo[]> {
+    // TODO: fix this hacky solution 
+    // console.log("🚀 ~ file: todos.controller.ts:95 ~ TodosController ~ findAll ~ query", query)
+    const from = query.deadlineFrom !== 'undefined' ? query.deadlineFrom : '';
+    // console.log("🚀 ~ file: todos.controller.ts:97 ~ TodosController ~ findAll ~ from", from)
+    const to = query.deadlineTo !== 'undefined'  ? query.deadlineTo : '';
+    return this.todosService.findAll(from, to);
   }
 
   @ApiOperation({ description: 'Get a todo by id' })

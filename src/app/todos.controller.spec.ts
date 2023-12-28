@@ -89,8 +89,8 @@ describe('TodosController', () => {
         },
       ];
       jest.spyOn(todosService, 'findAll').mockImplementation(() => result);
-
-      expect(await todosController.findAll()).toEqual(result);
+      const query = {deadlineFrom: '', deadlineTo: ''};
+      expect(await todosController.findAll(query)).toEqual(result);
       expect(todosService.findAll).toHaveBeenCalled();
     });
   });

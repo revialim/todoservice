@@ -38,7 +38,7 @@ describe('TodosService', () => {
     ];
     it('should create initial todo array with individual ids', async () => {
       todosService.setInitialData(initTodos);
-      const initializedTodos = todosService.findAll();
+      const initializedTodos = todosService.findAll('','');
       expect(initializedTodos).toEqual(initTodos);
     });
   });
@@ -94,7 +94,7 @@ describe('TodosService', () => {
     it('should find list of todos', async () => {
       todosService.setInitialData([]);
       const todos: Todo[] = [];
-      expect(todosService.findAll()).toEqual(todos);
+      expect(todosService.findAll('', '')).toEqual(todos);
     });
   });
 
@@ -231,7 +231,7 @@ describe('TodosService', () => {
     it('should remove todo with respective id from todo list', async () => {
       todosService.setInitialData([initialTodo]);
       todosService.delete(1);
-      const todosAfterDelete = todosService.findAll();
+      const todosAfterDelete = todosService.findAll('','');
       expect(todosAfterDelete.length).toBe(0);
     });
   });

@@ -47,8 +47,20 @@ export class TodosService {
     return newTodo;
   }
 
-  findAll(): Todo[] {
-    return this.todos;
+  findAll(deadlineFrom: string, deadlineTo: string): Todo[] {
+    console.log("🚀 ~ file: todos.service.ts:51 ~ TodosService ~ findAll ~ deadlineTo", deadlineTo)
+    console.log("🚀 ~ file: todos.service.ts:51 ~ TodosService ~ findAll ~ deadlineFrom", deadlineFrom)
+    if(deadlineFrom === '' || deadlineTo === ''){
+      return this.todos;
+    } else {
+      const from = new Date(deadlineFrom);
+      console.log("🚀 ~ file: todos.service.ts:55 ~ TodosService ~ findAll ~ from", from)
+      const to = new Date(deadlineTo);
+      return  this.todos.filter(t => {
+        console.log("🚀 ~ file: todos.service.ts:60 ~ TodosService ~ findAll ~ t", t)
+        return (t.deadline >= from && t.deadline <= to)
+      })
+    }
   }
 
   findOne(id: number): E.Either<Error, Todo> {
